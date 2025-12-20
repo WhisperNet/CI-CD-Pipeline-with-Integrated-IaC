@@ -5,7 +5,7 @@ variable subnet_cidr_block {
   default = "10.0.10.0/24"
 }
 variable avail_zone {
-  default = "eu-central-1a"
+  default = "us-east-1a"
 }
 variable env_prefix {
   default = "dev"
