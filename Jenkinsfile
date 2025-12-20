@@ -67,7 +67,6 @@ pipeline {
             environment {
                 DOCKER_CREDS = credentials('docker-hub')
             }
-
             steps {
                 script {
                     echo "Waiting for infra initialization"
@@ -81,7 +80,13 @@ pipeline {
                     sshagent(['server-ssh-key']) {
                         sh "scp -o StrictHostKeyChecking=no server-cmds.sh ${ec2Instance}:/home/ec2-user"
                         sh "scp -o StrictHostKeyChecking=no docker-compose.yaml ${ec2Instance}:/home/ec2-user"
-                        sh 'ssh -o StrictHostKeyChecking=no ' + ec2Instance + ' "export DOCKER_USER=\'$DOCKER_CREDS_USR\' DOCKER_PASS=\'$DOCKER_CREDS_PSW\' IMAGE_TAG=\'$IMAGE_NAME\' && bash ./server-cmds.sh"'
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ''' + ec2Instance + ''' \
+                            "export IMAGE='whispernet/tf-cicd-java-image:''' + env.IMAGE_NAME + '''' \
+                            DOCKER_USER='$DOCKER_CREDS_USR' \
+                            DOCKER_PWD='$DOCKER_CREDS_PSW' && \
+                            bash ./server-cmds.sh"
+                        '''
                     }
                 }
             }
